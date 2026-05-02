@@ -200,19 +200,19 @@ const buildIngredientRecipeIdeas = (wanted: string[]): Meal[] => {
 
 type CategoryKey = "veg" | "nonveg" | "dessert" | "snacks";
 
-// Per-dish image URLs (Wikimedia Commons — accurate, royalty-free, dish-specific).
+// Per-dish image URLs (Wikimedia Commons Special:FilePath resolves reliably to the current image file).
 const dishPhotos: Record<string, string> = {
   // Veg
-  "paneer-butter-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Paneer_Butter_Masala.jpg/640px-Paneer_Butter_Masala.jpg",
-  "palak-paneer": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Palak_paneer.JPG/640px-Palak_paneer.JPG",
-  "chana-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Chana_masala_%28cropped%29.jpg/640px-Chana_masala_%28cropped%29.jpg",
-  "dal-makhani": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Dal_Makhani_at_Tridivian_food_festival.jpg/640px-Dal_Makhani_at_Tridivian_food_festival.jpg",
-  "aloo-gobi": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Aloo_gobi_03.jpg/640px-Aloo_gobi_03.jpg",
-  "baingan-bharta": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Baingan_Bharta_Indian_Food.jpg/640px-Baingan_Bharta_Indian_Food.jpg",
-  "rajma": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Rajma_Curry.JPG/640px-Rajma_Curry.JPG",
-  "veg-biryani": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Vegetable_biryani.JPG/640px-Vegetable_biryani.JPG",
-  "malai-kofta": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Malai_Kofta.jpg/640px-Malai_Kofta.jpg",
-  "bhindi-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Bhindi_Masala_Gravy.jpg/640px-Bhindi_Masala_Gravy.jpg",
+  "paneer-butter-masala": commonsImage("Paneer_butter_masala_2.jpg"),
+  "palak-paneer": commonsImage("Palakpaneer_Rayagada_Odisha_0009.jpg"),
+  "chana-masala": commonsImage("Chana_Masala_-_Mohammed_-_Spice_Of_Life_2024-05-27.jpg"),
+  "dal-makhani": commonsImage("Dal_Makhani.jpg"),
+  "aloo-gobi": commonsImage("Aloo_gobi.jpg"),
+  "baingan-bharta": commonsImage("Baingan_Ka_Bhurta.JPG"),
+  "rajma": commonsImage("Rajma_Masala_(32081557778).jpg"),
+  "veg-biryani": commonsImage("Vegetable_Biryani_IMG_001.jpg"),
+  "malai-kofta": commonsImage("Malai_Kofta_Curry.jpg"),
+  "bhindi-masala": commonsImage("Bhindi_Masala.jpg"),
   // Non-Veg
   "butter-chicken": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Chicken_makhani.jpg/640px-Chicken_makhani.jpg",
   "chicken-tikka-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Chicken_tikka_masala.jpg/640px-Chicken_tikka_masala.jpg",
