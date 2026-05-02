@@ -400,15 +400,15 @@ const Index = () => {
       const wanted = list.map((i) => i.toLowerCase());
       const wantedTerms = wanted.map((w) => ingredientAliases[w] ?? [w]);
 
-      // Score each meal: matches in ingredients OR in the title/instructions.
+      // Score each meal using only its title/category/ingredient list so unrelated
+      // recipes are not picked just because the instructions mention the ingredient.
       const validMeals = allDetailed.filter((m): m is Meal => !!m);
       const scored = validMeals
         .map((m) => {
           const mealIngs = ingredientsOf(m);
-          const haystack = [
+          const recipeIdentity = [
             m.strMeal,
             m.strCategory,
-            m.strInstructions,
             ...mealIngs,
           ]
             .join(" ")
@@ -417,7 +417,7 @@ const Index = () => {
             terms.some(
               (term) =>
                 mealIngs.some((mi) => mi.includes(term) || term.includes(mi)) ||
-                haystack.includes(term)
+                recipeIdentity.includes(term)
             )
           ).length;
           return { meal: m, matches };
