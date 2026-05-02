@@ -167,26 +167,76 @@ const buildIngredientRecipeIdeas = (wanted: string[]): Meal[] => {
 
 type CategoryKey = "veg" | "nonveg" | "dessert" | "snacks";
 
-const VEG_PHOTO = "https://www.themealdb.com/images/media/meals/urtpqw1487341253.jpg";
-const NONVEG_PHOTO = "https://www.themealdb.com/images/media/meals/1529446352.jpg";
-const DESSERT_PHOTO = "https://www.themealdb.com/images/media/meals/wyrqqq1468233628.jpg";
-const SNACK_PHOTO = "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg";
+// Per-dish image URLs (Wikimedia Commons — accurate, royalty-free, dish-specific).
+const dishPhotos: Record<string, string> = {
+  // Veg
+  "paneer-butter-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Paneer_Butter_Masala.jpg/640px-Paneer_Butter_Masala.jpg",
+  "palak-paneer": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Palak_paneer.JPG/640px-Palak_paneer.JPG",
+  "chana-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Chana_masala_%28cropped%29.jpg/640px-Chana_masala_%28cropped%29.jpg",
+  "dal-makhani": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Dal_Makhani_at_Tridivian_food_festival.jpg/640px-Dal_Makhani_at_Tridivian_food_festival.jpg",
+  "aloo-gobi": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Aloo_gobi_03.jpg/640px-Aloo_gobi_03.jpg",
+  "baingan-bharta": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Baingan_Bharta_Indian_Food.jpg/640px-Baingan_Bharta_Indian_Food.jpg",
+  "rajma": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Rajma_Curry.JPG/640px-Rajma_Curry.JPG",
+  "veg-biryani": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Vegetable_biryani.JPG/640px-Vegetable_biryani.JPG",
+  "malai-kofta": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Malai_Kofta.jpg/640px-Malai_Kofta.jpg",
+  "bhindi-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Bhindi_Masala_Gravy.jpg/640px-Bhindi_Masala_Gravy.jpg",
+  // Non-Veg
+  "butter-chicken": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Chicken_makhani.jpg/640px-Chicken_makhani.jpg",
+  "chicken-tikka-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Chicken_tikka_masala.jpg/640px-Chicken_tikka_masala.jpg",
+  "chicken-biryani": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Chicken_biryani_2.JPG/640px-Chicken_biryani_2.JPG",
+  "mutton-rogan-josh": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Roghan_Josh.jpg/640px-Roghan_Josh.jpg",
+  "mutton-curry": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Mutton_Curry.jpg/640px-Mutton_Curry.jpg",
+  "chicken-chettinad": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Chicken_Chettinad.jpg/640px-Chicken_Chettinad.jpg",
+  "fish-curry": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Goan_Fish_Curry.jpg/640px-Goan_Fish_Curry.jpg",
+  "prawn-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Prawn_curry_with_rice.jpg/640px-Prawn_curry_with_rice.jpg",
+  "chicken-korma": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Chicken_korma.jpg/640px-Chicken_korma.jpg",
+  "egg-curry": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Egg_curry_-_Kerala_cuisine.jpg/640px-Egg_curry_-_Kerala_cuisine.jpg",
+  // Dessert
+  "gulab-jamun": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Gulab_Jamun_%28Gibe3%29.JPG/640px-Gulab_Jamun_%28Gibe3%29.JPG",
+  "rasgulla": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Rasgulla_%28Roshogolla%29.jpg/640px-Rasgulla_%28Roshogolla%29.jpg",
+  "rasmalai": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Ras_Malai_-_Closeup.JPG/640px-Ras_Malai_-_Closeup.JPG",
+  "kheer": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Rice_kheer.jpg/640px-Rice_kheer.jpg",
+  "gajar-halwa": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Gajar_Halwa.JPG/640px-Gajar_Halwa.JPG",
+  "jalebi": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Jalebi_-_Kolkata_2011-10-08_5995.JPG/640px-Jalebi_-_Kolkata_2011-10-08_5995.JPG",
+  "kulfi": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Matka_Kulfi.jpg/640px-Matka_Kulfi.jpg",
+  "besan-ladoo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Besan_Ladoo.jpg/640px-Besan_Ladoo.jpg",
+  "mysore-pak": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Mysore_Pak_from_Sri_Krishna_Sweets.jpg/640px-Mysore_Pak_from_Sri_Krishna_Sweets.jpg",
+  "kaju-katli": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Kaju_Barfi.JPG/640px-Kaju_Barfi.JPG",
+  // Snacks
+  "veg-sandwich": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Bombay_sandwich.jpg/640px-Bombay_sandwich.jpg",
+  "grilled-cheese-chutney-sandwich": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Grilled_cheese_sandwich.jpg/640px-Grilled_cheese_sandwich.jpg",
+  "aloo-tikki-burger": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/McAloo_Tikki_Burger.jpg/640px-McAloo_Tikki_Burger.jpg",
+  "paneer-burger": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Paneer_Burger.jpg/640px-Paneer_Burger.jpg",
+  "masala-pasta": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Penne_pasta.jpg/640px-Penne_pasta.jpg",
+  "schezwan-pasta": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Penne_pasta.jpg/640px-Penne_pasta.jpg",
+  "veg-cutlet": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Vegetable_cutlet.jpg/640px-Vegetable_cutlet.jpg",
+  "samosa": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Samosa-and-chutney.jpg/640px-Samosa-and-chutney.jpg",
+  "pav-bhaji": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Pav_Bhaji_with_Onion_and_Lemon.jpg/640px-Pav_Bhaji_with_Onion_and_Lemon.jpg",
+  "vada-pav": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Vada_Pav-2.jpg/640px-Vada_Pav-2.jpg",
+};
+
+const FALLBACK_PHOTO = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Indian_Food.jpg/640px-Indian_Food.jpg";
 
 const makeIdea = (
   key: string,
   name: string,
-  photo: string,
+  _unused: string,
   category: string,
   description: string,
 ): Meal => ({
   idMeal: `idea-${key}`,
   strMeal: name,
-  strMealThumb: photo,
+  strMealThumb: dishPhotos[key] ?? FALLBACK_PHOTO,
   strCategory: category,
   strArea: "India",
   customDescription: description,
   customLink: `https://www.google.com/search?q=${encodeURIComponent("Indian " + name + " recipe")}`,
 });
+
+const VEG_PHOTO = FALLBACK_PHOTO;
+const NONVEG_PHOTO = FALLBACK_PHOTO;
+const DESSERT_PHOTO = FALLBACK_PHOTO;
+const SNACK_PHOTO = FALLBACK_PHOTO;
 
 const categoryRecipes: Record<CategoryKey, Meal[]> = {
   veg: [
