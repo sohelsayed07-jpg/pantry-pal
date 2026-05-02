@@ -14,6 +14,7 @@ type Meal = {
   strInstructions?: string;
   strSource?: string;
   strYoutube?: string;
+  [key: string]: string | undefined;
 };
 
 const Index = () => {
@@ -37,43 +38,55 @@ const Index = () => {
     setLoading(true);
     setSearched(true);
     try {
-      // Fetch Indian meals + each ingredient filter, then intersect on idMeal.
-      const indianPromise = fetch(
+      // Fetch all Indian meals once, then filter locally by ingredient text.
+      // TheMealDB's filter.php only tags one main ingredient per meal, so
+      // intersecting strict ingredient filters returns almost nothing.
+      const indianRes = await fetch(
         `https://www.themealdb.com/api/json/v1/1/filter.php?a=Indian`
-      )
-        .then((r) => r.json())
-        .then((d) => (d.meals as Meal[] | null) ?? []);
+      ).catch(() => null);
 
-      const ingredientPromises = Promise.all(
-        list.map((ing) =>
-          fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(ing)}`)
-            .then((r) => r.json())
-            .then((d) => (d.meals as Meal[] | null) ?? [])
-        )
-      );
-
-      const [indianMeals, ingredientResults] = await Promise.all([
-        indianPromise,
-        ingredientPromises,
-      ]);
-
-      const indianIds = new Set(indianMeals.map((m) => m.idMeal));
-      let intersected = (ingredientResults[0] ?? []).filter((m) => indianIds.has(m.idMeal));
-      for (let i = 1; i < ingredientResults.length; i++) {
-        const ids = new Set(ingredientResults[i].map((m) => m.idMeal));
-        intersected = intersected.filter((m) => ids.has(m.idMeal));
+      if (!indianRes || !indianRes.ok) {
+        throw new Error("Failed to load Indian recipes");
       }
 
-      const top = intersected.slice(0, 10);
+      const indianData = await indianRes.json();
+      const indianMeals: Meal[] = indianData.meals ?? [];
 
-      // Fetch full details for each (for description + link)
-      const detailed = await Promise.all(
-        top.map((m) =>
+      // Fetch full details for every Indian meal so we can match all ingredients.
+      const allDetailed = await Promise.all(
+        indianMeals.map((m) =>
           fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${m.idMeal}`)
             .then((r) => r.json())
-            .then((d) => (d.meals?.[0] as Meal) ?? m)
+            .then((d) => (d.meals?.[0] as Meal) ?? null)
+            .catch(() => null)
         )
       );
+
+      const ingredientsOf = (m: Meal): string[] => {
+        const out: string[] = [];
+        for (let i = 1; i <= 20; i++) {
+          const v = m[`strIngredient${i}`];
+          if (v && v.trim()) out.push(v.toLowerCase());
+        }
+        return out;
+      };
+
+      const wanted = list.map((i) => i.toLowerCase());
+
+      // Score: how many of the user's ingredients appear in the meal.
+      const scored = allDetailed
+        .filter((m): m is Meal => !!m)
+        .map((m) => {
+          const mealIngs = ingredientsOf(m);
+          const matches = wanted.filter((w) =>
+            mealIngs.some((mi) => mi.includes(w) || w.includes(mi))
+          ).length;
+          return { meal: m, matches };
+        })
+        .filter((x) => x.matches > 0)
+        .sort((a, b) => b.matches - a.matches);
+
+      const detailed = scored.slice(0, 10).map((x) => x.meal);
 
       setRecipes(detailed);
       if (detailed.length === 0) {
