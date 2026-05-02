@@ -20,6 +20,17 @@ type Meal = {
   [key: string]: string | undefined;
 };
 
+function commonsImage(fileName: string) {
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(fileName)}?width=640`;
+}
+
+function normalizeRecipeKey(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 const ingredientAliases: Record<string, string[]> = {
   mutton: ["mutton", "lamb", "goat"],
   capsicum: ["capsicum", "bell pepper", "pepper"],
@@ -35,7 +46,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-rogan-josh",
     strMeal: "Mutton Rogan Josh",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strMealThumb: commonsImage("Roghan_Josh.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Kashmiri-style mutton simmered with yogurt, browned onions, fennel, ginger, and warming spices.",
@@ -44,7 +55,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-biryani",
     strMeal: "Mutton Biryani",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/xrttsx1487339558.jpg",
+    strMealThumb: commonsImage("Mutton_biryani.JPG"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Fragrant basmati rice layered with spiced mutton, mint, fried onions, saffron, and slow dum cooking.",
@@ -53,7 +64,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-curry",
     strMeal: "Mutton Curry",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strMealThumb: commonsImage("Odia_Mutton_Curry_(Mansha_Tarkari).jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Homestyle Indian mutton curry cooked with onion, tomato, ginger-garlic paste, garam masala, and coriander.",
@@ -62,7 +73,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-keema",
     strMeal: "Mutton Keema Masala",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strMealThumb: commonsImage("Keema_matar.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Minced mutton sautéed with peas, onions, tomatoes, green chillies, and whole spices for a rich masala.",
@@ -71,7 +82,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-korma",
     strMeal: "Mutton Korma",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strMealThumb: commonsImage("Mutton_korma.JPG"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Tender mutton in a creamy cashew-yogurt gravy with cardamom, cloves, cinnamon, and gentle heat.",
@@ -80,7 +91,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-pepper-fry",
     strMeal: "Mutton Pepper Fry",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strMealThumb: commonsImage("Mutton_chukka.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "South Indian dry-style mutton tossed with crushed black pepper, curry leaves, coconut, and roasted spices.",
@@ -89,7 +100,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-sukka",
     strMeal: "Mutton Sukka",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strMealThumb: commonsImage("Mutton_chukka.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "A dry coastal-style mutton dish with roasted coconut, curry leaves, chilli, coriander, and garam masala.",
@@ -98,7 +109,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-do-pyaza",
     strMeal: "Mutton Do Pyaza",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strMealThumb: commonsImage("Mutton_Curry_1.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Mutton cooked with onions added two ways for sweetness, texture, and a thick restaurant-style gravy.",
@@ -107,7 +118,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-saagwala",
     strMeal: "Mutton Saagwala",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strMealThumb: commonsImage("Saag_gosht.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Slow-cooked mutton folded into spiced spinach gravy with garlic, green chilli, cumin, and cream.",
@@ -116,7 +127,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-kheema-pav",
     strMeal: "Mutton Kheema Pav",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strMealThumb: commonsImage("Keema_pav.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Mumbai-style spiced mutton mince finished with butter, coriander, lime, and served with toasted pav.",
