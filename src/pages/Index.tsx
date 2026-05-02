@@ -14,8 +14,114 @@ type Meal = {
   strInstructions?: string;
   strSource?: string;
   strYoutube?: string;
+  customDescription?: string;
+  customLink?: string;
   [key: string]: string | undefined;
 };
+
+const ingredientAliases: Record<string, string[]> = {
+  mutton: ["mutton", "lamb", "goat"],
+  capsicum: ["capsicum", "bell pepper", "pepper"],
+  brinjal: ["brinjal", "eggplant", "aubergine"],
+  curd: ["curd", "yogurt", "yoghurt"],
+  coriander: ["coriander", "cilantro"],
+  chana: ["chana", "chickpea", "chickpeas"],
+  aloo: ["aloo", "potato"],
+  paneer: ["paneer", "cottage cheese"],
+};
+
+const muttonRecipeIdeas: Meal[] = [
+  {
+    idMeal: "idea-mutton-rogan-josh",
+    strMeal: "Mutton Rogan Josh",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Kashmiri-style mutton simmered with yogurt, browned onions, fennel, ginger, and warming spices.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+rogan+josh+recipe",
+  },
+  {
+    idMeal: "idea-mutton-biryani",
+    strMeal: "Mutton Biryani",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/xrttsx1487339558.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Fragrant basmati rice layered with spiced mutton, mint, fried onions, saffron, and slow dum cooking.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+biryani+recipe",
+  },
+  {
+    idMeal: "idea-mutton-curry",
+    strMeal: "Mutton Curry",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Homestyle Indian mutton curry cooked with onion, tomato, ginger-garlic paste, garam masala, and coriander.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+curry+recipe",
+  },
+  {
+    idMeal: "idea-mutton-keema",
+    strMeal: "Mutton Keema Masala",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Minced mutton sautéed with peas, onions, tomatoes, green chillies, and whole spices for a rich masala.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+keema+masala+recipe",
+  },
+  {
+    idMeal: "idea-mutton-korma",
+    strMeal: "Mutton Korma",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Tender mutton in a creamy cashew-yogurt gravy with cardamom, cloves, cinnamon, and gentle heat.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+korma+recipe",
+  },
+  {
+    idMeal: "idea-mutton-pepper-fry",
+    strMeal: "Mutton Pepper Fry",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "South Indian dry-style mutton tossed with crushed black pepper, curry leaves, coconut, and roasted spices.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+pepper+fry+recipe",
+  },
+  {
+    idMeal: "idea-mutton-sukka",
+    strMeal: "Mutton Sukka",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "A dry coastal-style mutton dish with roasted coconut, curry leaves, chilli, coriander, and garam masala.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+sukka+recipe",
+  },
+  {
+    idMeal: "idea-mutton-do-pyaza",
+    strMeal: "Mutton Do Pyaza",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Mutton cooked with onions added two ways for sweetness, texture, and a thick restaurant-style gravy.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+do+pyaza+recipe",
+  },
+  {
+    idMeal: "idea-mutton-saagwala",
+    strMeal: "Mutton Saagwala",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Slow-cooked mutton folded into spiced spinach gravy with garlic, green chilli, cumin, and cream.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+saagwala+recipe",
+  },
+  {
+    idMeal: "idea-mutton-kheema-pav",
+    strMeal: "Mutton Kheema Pav",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Mumbai-style spiced mutton mince finished with butter, coriander, lime, and served with toasted pav.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+kheema+pav+recipe",
+  },
+];
 
 const Index = () => {
   const [ingredients, setIngredients] = useState("");
@@ -72,39 +178,48 @@ const Index = () => {
       };
 
       const wanted = list.map((i) => i.toLowerCase());
+      const wantedTerms = wanted.map((w) => ingredientAliases[w] ?? [w]);
 
       // Score each meal: matches in ingredients OR in the title/instructions.
       const validMeals = allDetailed.filter((m): m is Meal => !!m);
       const scored = validMeals
         .map((m) => {
           const mealIngs = ingredientsOf(m);
-          const haystack = (
-            m.strMeal + " " + (m.strInstructions ?? "")
-          ).toLowerCase();
-          const matches = wanted.filter(
-            (w) =>
-              mealIngs.some((mi) => mi.includes(w) || w.includes(mi)) ||
-              haystack.includes(w)
+          const haystack = [
+            m.strMeal,
+            m.strCategory,
+            m.strInstructions,
+            ...mealIngs,
+          ]
+            .join(" ")
+            .toLowerCase();
+          const matches = wantedTerms.filter((terms) =>
+            terms.some(
+              (term) =>
+                mealIngs.some((mi) => mi.includes(term) || term.includes(mi)) ||
+                haystack.includes(term)
+            )
           ).length;
           return { meal: m, matches };
         })
         .sort((a, b) => b.matches - a.matches);
 
-      // Always show 10: matching recipes first, then other Indian dishes to fill up.
+      // Show only relevant recipes. For mutton, TheMealDB has very few Indian matches,
+      // so add Indian mutton recipe ideas instead of unrelated filler dishes.
       const matched = scored.filter((x) => x.matches > 0).map((x) => x.meal);
-      const fillers = scored.filter((x) => x.matches === 0).map((x) => x.meal);
-      const detailed = [...matched, ...fillers].slice(0, 10);
+      const shouldAddMuttonIdeas = wanted.some((w) => w === "mutton");
+      const muttonFillers = shouldAddMuttonIdeas
+        ? muttonRecipeIdeas.filter(
+            (idea) => !matched.some((meal) => meal.strMeal.toLowerCase() === idea.strMeal.toLowerCase())
+          )
+        : [];
+      const detailed = [...matched, ...muttonFillers].slice(0, 10);
 
       setRecipes(detailed);
-      if (matched.length === 0 && detailed.length > 0) {
+      if (detailed.length === 0) {
         toast({
-          title: "No exact matches",
-          description: "Showing other popular Indian dishes you might like.",
-        });
-      } else if (detailed.length === 0) {
-        toast({
-          title: "No Indian recipes found",
-          description: "Try common ingredients like chicken, paneer, potato, or lentils.",
+          title: "No matching Indian recipes found",
+          description: "Try another ingredient like chicken, paneer, potato, mutton, or lentils.",
         });
       }
     } catch (err) {
@@ -177,7 +292,7 @@ const Index = () => {
 
           {!loading &&
             recipes.map((r) => {
-              const link = r.strSource || r.strYoutube;
+              const link = r.strSource || r.strYoutube || r.customLink;
               return (
                 <Card
                   key={r.idMeal}
@@ -204,7 +319,7 @@ const Index = () => {
                         )}
                       </div>
                       <h2 className="text-lg font-semibold leading-tight">{r.strMeal}</h2>
-                      <p className="text-sm text-muted-foreground">{shortDesc(r.strInstructions)}</p>
+                      <p className="text-sm text-muted-foreground">{r.customDescription || shortDesc(r.strInstructions)}</p>
                       {link && (
                         <a
                           href={link}
