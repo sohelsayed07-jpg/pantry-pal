@@ -400,7 +400,7 @@ const Index = () => {
       const wanted = list.map((i) => i.toLowerCase());
       const wantedTerms = wanted.map((w) => ingredientAliases[w] ?? [w]);
 
-      // Score each meal using only its title/category/ingredient list so unrelated
+      // Score each meal using only its title and main ingredients so unrelated
       // recipes are not picked just because the instructions mention the ingredient.
       const validMeals = allDetailed.filter((m): m is Meal => !!m);
       const scored = validMeals
@@ -408,8 +408,7 @@ const Index = () => {
           const mealIngs = ingredientsOf(m);
           const recipeIdentity = [
             m.strMeal,
-            m.strCategory,
-            ...mealIngs,
+            ...mealIngs.slice(0, 5),
           ]
             .join(" ")
             .toLowerCase();
