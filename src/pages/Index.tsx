@@ -123,6 +123,47 @@ const muttonRecipeIdeas: Meal[] = [
   },
 ];
 
+const titleCase = (value: string) =>
+  value
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+const buildIngredientRecipeIdeas = (wanted: string[]): Meal[] => {
+  const clean = wanted.map((item) => item.trim().toLowerCase()).filter(Boolean);
+  const display = clean.map(titleCase).join(" & ");
+  const ingredientText = display.toLowerCase();
+  const idBase = clean.join("-").replace(/[^a-z0-9-]/g, "-");
+  const searchBase = encodeURIComponent(`Indian ${ingredientText} recipe`);
+  const photo = clean.some((item) => ["chicken", "mutton", "lamb", "goat"].includes(item))
+    ? "https://www.themealdb.com/images/media/meals/1529446352.jpg"
+    : "https://www.themealdb.com/images/media/meals/urtpqw1487341253.jpg";
+
+  const templates = [
+    ["Masala Curry", `A rich Indian curry built around ${ingredientText}, onion, tomato, ginger-garlic paste, and garam masala.`],
+    ["Korma", `A creamy ${ingredientText} korma cooked with yogurt, cashew paste, cardamom, cloves, and mild spices.`],
+    ["Biryani", `Layered basmati rice with ${ingredientText}, mint, fried onions, saffron, and warm biryani spices.`],
+    ["Tikka Masala", `${display} marinated with yogurt and spices, then simmered in a smoky tomato-butter masala.`],
+    ["Do Pyaza", `${display} cooked with onions added in two stages for a sweet, thick, restaurant-style gravy.`],
+    ["Pepper Fry", `A dry-style ${ingredientText} fry tossed with black pepper, curry leaves, cumin, and coriander.`],
+    ["Saagwala", `${display} folded into a spiced spinach gravy with garlic, green chilli, cumin, and cream.`],
+    ["Jalfrezi", `A quick wok-style ${ingredientText} dish with capsicum, onion, tomato, and tangy Indian spices.`],
+    ["Vindaloo", `A bold, tangy ${ingredientText} curry with chilli, vinegar, garlic, cumin, and deep roasted spices.`],
+    ["Pulao", `A one-pot Indian pulao with ${ingredientText}, basmati rice, whole spices, herbs, and fried onions.`],
+  ];
+
+  return templates.map(([suffix, description], index) => ({
+    idMeal: `idea-${idBase}-${index}`,
+    strMeal: `${display} ${suffix}`,
+    strMealThumb: photo,
+    strCategory: display,
+    strArea: "India",
+    customDescription: description,
+    customLink: `https://www.google.com/search?q=${searchBase}+${encodeURIComponent(suffix.toLowerCase())}`,
+  }));
+};
+
 const Index = () => {
   const [ingredients, setIngredients] = useState("");
   const [loading, setLoading] = useState(false);
@@ -208,12 +249,10 @@ const Index = () => {
       // so add Indian mutton recipe ideas instead of unrelated filler dishes.
       const matched = scored.filter((x) => x.matches > 0).map((x) => x.meal);
       const shouldAddMuttonIdeas = wanted.some((w) => w === "mutton");
-      const muttonFillers = shouldAddMuttonIdeas
-        ? muttonRecipeIdeas.filter(
-            (idea) => !matched.some((meal) => meal.strMeal.toLowerCase() === idea.strMeal.toLowerCase())
-          )
-        : [];
-      const detailed = [...matched, ...muttonFillers].slice(0, 10);
+      const ideaFillers = (shouldAddMuttonIdeas ? muttonRecipeIdeas : buildIngredientRecipeIdeas(wanted)).filter(
+        (idea) => !matched.some((meal) => meal.strMeal.toLowerCase() === idea.strMeal.toLowerCase())
+      );
+      const detailed = [...matched, ...ideaFillers].slice(0, 10);
 
       setRecipes(detailed);
       if (detailed.length === 0) {
