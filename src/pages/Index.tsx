@@ -225,16 +225,16 @@ const dishPhotos: Record<string, string> = {
   "chicken-korma": commonsImage("Chicken_Korma.JPG"),
   "egg-curry": commonsImage("Egg_curry_-_Kerala_cuisine.jpg"),
   // Dessert
-  "gulab-jamun": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Gulab_Jamun_%28Gibe3%29.JPG/640px-Gulab_Jamun_%28Gibe3%29.JPG",
-  "rasgulla": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Rasgulla_%28Roshogolla%29.jpg/640px-Rasgulla_%28Roshogolla%29.jpg",
-  "rasmalai": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Ras_Malai_-_Closeup.JPG/640px-Ras_Malai_-_Closeup.JPG",
-  "kheer": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Rice_kheer.jpg/640px-Rice_kheer.jpg",
-  "gajar-halwa": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Gajar_Halwa.JPG/640px-Gajar_Halwa.JPG",
-  "jalebi": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Jalebi_-_Kolkata_2011-10-08_5995.JPG/640px-Jalebi_-_Kolkata_2011-10-08_5995.JPG",
-  "kulfi": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Matka_Kulfi.jpg/640px-Matka_Kulfi.jpg",
-  "besan-ladoo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Besan_Ladoo.jpg/640px-Besan_Ladoo.jpg",
-  "mysore-pak": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Mysore_Pak_from_Sri_Krishna_Sweets.jpg/640px-Mysore_Pak_from_Sri_Krishna_Sweets.jpg",
-  "kaju-katli": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Kaju_Barfi.JPG/640px-Kaju_Barfi.JPG",
+  "gulab-jamun": commonsImage("Two_Gulab_Jamun_in_a_plate_01.jpg"),
+  "rasgulla": commonsImage("Rasgulla.jpg"),
+  "rasmalai": commonsImage("Ras_Malai_-_Closeup.JPG"),
+  "kheer": commonsImage("Rice_kheer.jpg"),
+  "gajar-halwa": commonsImage("Gajar_Halwa.JPG"),
+  "jalebi": commonsImage("Jalebi_-_Kolkata_2011-10-08_5995.JPG"),
+  "kulfi": commonsImage("Matka_Kulfi.jpg"),
+  "besan-ladoo": commonsImage("Besan_Ladoo.jpg"),
+  "mysore-pak": commonsImage("Mysore_Pak_from_Sri_Krishna_Sweets.jpg"),
+  "kaju-katli": commonsImage("Kaju_Barfi.JPG"),
   // Snacks
   "veg-sandwich": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Bombay_sandwich.jpg/640px-Bombay_sandwich.jpg",
   "grilled-cheese-chutney-sandwich": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Grilled_cheese_sandwich.jpg/640px-Grilled_cheese_sandwich.jpg",
@@ -249,6 +249,10 @@ const dishPhotos: Record<string, string> = {
 };
 
 const FALLBACK_PHOTO = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Indian_Food.jpg/640px-Indian_Food.jpg";
+
+function getDishPhoto(name: string) {
+  return dishPhotos[normalizeRecipeKey(name)] ?? FALLBACK_PHOTO;
+}
 
 const makeIdea = (
   key: string,
