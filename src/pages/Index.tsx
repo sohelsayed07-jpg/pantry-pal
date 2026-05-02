@@ -178,39 +178,48 @@ const Index = () => {
       };
 
       const wanted = list.map((i) => i.toLowerCase());
+      const wantedTerms = wanted.map((w) => ingredientAliases[w] ?? [w]);
 
       // Score each meal: matches in ingredients OR in the title/instructions.
       const validMeals = allDetailed.filter((m): m is Meal => !!m);
       const scored = validMeals
         .map((m) => {
           const mealIngs = ingredientsOf(m);
-          const haystack = (
-            m.strMeal + " " + (m.strInstructions ?? "")
-          ).toLowerCase();
-          const matches = wanted.filter(
-            (w) =>
-              mealIngs.some((mi) => mi.includes(w) || w.includes(mi)) ||
-              haystack.includes(w)
+          const haystack = [
+            m.strMeal,
+            m.strCategory,
+            m.strInstructions,
+            ...mealIngs,
+          ]
+            .join(" ")
+            .toLowerCase();
+          const matches = wantedTerms.filter((terms) =>
+            terms.some(
+              (term) =>
+                mealIngs.some((mi) => mi.includes(term) || term.includes(mi)) ||
+                haystack.includes(term)
+            )
           ).length;
           return { meal: m, matches };
         })
         .sort((a, b) => b.matches - a.matches);
 
-      // Always show 10: matching recipes first, then other Indian dishes to fill up.
+      // Show only relevant recipes. For mutton, TheMealDB has very few Indian matches,
+      // so add Indian mutton recipe ideas instead of unrelated filler dishes.
       const matched = scored.filter((x) => x.matches > 0).map((x) => x.meal);
-      const fillers = scored.filter((x) => x.matches === 0).map((x) => x.meal);
-      const detailed = [...matched, ...fillers].slice(0, 10);
+      const shouldAddMuttonIdeas = wanted.some((w) => w === "mutton");
+      const muttonFillers = shouldAddMuttonIdeas
+        ? muttonRecipeIdeas.filter(
+            (idea) => !matched.some((meal) => meal.strMeal.toLowerCase() === idea.strMeal.toLowerCase())
+          )
+        : [];
+      const detailed = [...matched, ...muttonFillers].slice(0, 10);
 
       setRecipes(detailed);
-      if (matched.length === 0 && detailed.length > 0) {
+      if (detailed.length === 0) {
         toast({
-          title: "No exact matches",
-          description: "Showing other popular Indian dishes you might like.",
-        });
-      } else if (detailed.length === 0) {
-        toast({
-          title: "No Indian recipes found",
-          description: "Try common ingredients like chicken, paneer, potato, or lentils.",
+          title: "No matching Indian recipes found",
+          description: "Try another ingredient like chicken, paneer, potato, mutton, or lentils.",
         });
       }
     } catch (err) {
