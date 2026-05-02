@@ -42,7 +42,7 @@ const Index = () => {
       // TheMealDB's filter.php only tags one main ingredient per meal, so
       // intersecting strict ingredient filters returns almost nothing.
       const indianRes = await fetch(
-        `https://www.themealdb.com/api/json/v1/1/filter.php?a=Indian`
+        `https://www.themealdb.com/api/json/v1/1/filter.php?a=India`
       ).catch(() => null);
 
       if (!indianRes || !indianRes.ok) {
