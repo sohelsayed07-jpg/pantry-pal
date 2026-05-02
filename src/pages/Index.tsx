@@ -73,23 +73,35 @@ const Index = () => {
 
       const wanted = list.map((i) => i.toLowerCase());
 
-      // Score: how many of the user's ingredients appear in the meal.
-      const scored = allDetailed
-        .filter((m): m is Meal => !!m)
+      // Score each meal: matches in ingredients OR in the title/instructions.
+      const validMeals = allDetailed.filter((m): m is Meal => !!m);
+      const scored = validMeals
         .map((m) => {
           const mealIngs = ingredientsOf(m);
-          const matches = wanted.filter((w) =>
-            mealIngs.some((mi) => mi.includes(w) || w.includes(mi))
+          const haystack = (
+            m.strMeal + " " + (m.strInstructions ?? "")
+          ).toLowerCase();
+          const matches = wanted.filter(
+            (w) =>
+              mealIngs.some((mi) => mi.includes(w) || w.includes(mi)) ||
+              haystack.includes(w)
           ).length;
           return { meal: m, matches };
         })
-        .filter((x) => x.matches > 0)
         .sort((a, b) => b.matches - a.matches);
 
-      const detailed = scored.slice(0, 10).map((x) => x.meal);
+      // Always show 10: matching recipes first, then other Indian dishes to fill up.
+      const matched = scored.filter((x) => x.matches > 0).map((x) => x.meal);
+      const fillers = scored.filter((x) => x.matches === 0).map((x) => x.meal);
+      const detailed = [...matched, ...fillers].slice(0, 10);
 
       setRecipes(detailed);
-      if (detailed.length === 0) {
+      if (matched.length === 0 && detailed.length > 0) {
+        toast({
+          title: "No exact matches",
+          description: "Showing other popular Indian dishes you might like.",
+        });
+      } else if (detailed.length === 0) {
         toast({
           title: "No Indian recipes found",
           description: "Try common ingredients like chicken, paneer, potato, or lentils.",
