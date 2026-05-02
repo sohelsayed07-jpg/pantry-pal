@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, ChefHat, ExternalLink, Loader2, UtensilsCrossed } from "lucide-react";
+import { Search, ExternalLink, Loader2, UtensilsCrossed, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -37,8 +37,14 @@ const Index = () => {
     setLoading(true);
     setSearched(true);
     try {
-      // TheMealDB filters by single ingredient — fetch each, then intersect.
-      const responses = await Promise.all(
+      // Fetch Indian meals + each ingredient filter, then intersect on idMeal.
+      const indianPromise = fetch(
+        `https://www.themealdb.com/api/json/v1/1/filter.php?a=Indian`
+      )
+        .then((r) => r.json())
+        .then((d) => (d.meals as Meal[] | null) ?? []);
+
+      const ingredientPromises = Promise.all(
         list.map((ing) =>
           fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(ing)}`)
             .then((r) => r.json())
@@ -46,9 +52,15 @@ const Index = () => {
         )
       );
 
-      let intersected = responses[0] ?? [];
-      for (let i = 1; i < responses.length; i++) {
-        const ids = new Set(responses[i].map((m) => m.idMeal));
+      const [indianMeals, ingredientResults] = await Promise.all([
+        indianPromise,
+        ingredientPromises,
+      ]);
+
+      const indianIds = new Set(indianMeals.map((m) => m.idMeal));
+      let intersected = (ingredientResults[0] ?? []).filter((m) => indianIds.has(m.idMeal));
+      for (let i = 1; i < ingredientResults.length; i++) {
+        const ids = new Set(ingredientResults[i].map((m) => m.idMeal));
         intersected = intersected.filter((m) => ids.has(m.idMeal));
       }
 
@@ -66,8 +78,8 @@ const Index = () => {
       setRecipes(detailed);
       if (detailed.length === 0) {
         toast({
-          title: "No recipes found",
-          description: "Try fewer or more common ingredients.",
+          title: "No Indian recipes found",
+          description: "Try common ingredients like chicken, paneer, potato, or lentils.",
         });
       }
     } catch (err) {
@@ -85,13 +97,13 @@ const Index = () => {
       <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:pt-14">
         <header className="mb-8 text-center">
           <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--gradient-warm)] shadow-[var(--shadow-soft)]">
-            <ChefHat className="h-7 w-7 text-primary-foreground" />
+            <Flame className="h-7 w-7 text-primary-foreground" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            What should I cook?
+            What Indian dish to cook?
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Type the ingredients you have. We'll suggest recipes.
+            Type the ingredients you have. We'll suggest authentic Indian recipes.
           </p>
         </header>
 
@@ -105,7 +117,7 @@ const Index = () => {
               <Input
                 value={ingredients}
                 onChange={(e) => setIngredients(e.target.value)}
-                placeholder="chicken, carrot, capsicum"
+                placeholder="paneer, tomato, onion"
                 className="h-12 rounded-xl border-0 bg-secondary pl-10 text-base focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label="Ingredients"
               />
