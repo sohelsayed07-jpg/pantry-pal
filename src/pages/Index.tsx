@@ -236,19 +236,19 @@ const dishPhotos: Record<string, string> = {
   "mysore-pak": commonsImage("Mysore_Pak_from_Sri_Krishna_Sweets.jpg"),
   "kaju-katli": commonsImage("Kaju_Barfi.JPG"),
   // Snacks
-  "veg-sandwich": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Bombay_sandwich.jpg/640px-Bombay_sandwich.jpg",
-  "grilled-cheese-chutney-sandwich": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Grilled_cheese_sandwich.jpg/640px-Grilled_cheese_sandwich.jpg",
-  "aloo-tikki-burger": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/McAloo_Tikki_Burger.jpg/640px-McAloo_Tikki_Burger.jpg",
-  "paneer-burger": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Paneer_Burger.jpg/640px-Paneer_Burger.jpg",
-  "masala-pasta": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Penne_pasta.jpg/640px-Penne_pasta.jpg",
-  "schezwan-pasta": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Penne_pasta.jpg/640px-Penne_pasta.jpg",
-  "veg-cutlet": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Vegetable_cutlet.jpg/640px-Vegetable_cutlet.jpg",
-  "samosa": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Samosa-and-chutney.jpg/640px-Samosa-and-chutney.jpg",
-  "pav-bhaji": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Pav_Bhaji_with_Onion_and_Lemon.jpg/640px-Pav_Bhaji_with_Onion_and_Lemon.jpg",
-  "vada-pav": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Vada_Pav-2.jpg/640px-Vada_Pav-2.jpg",
+  "veg-sandwich": commonsImage("Bombay_sandwich.jpg"),
+  "grilled-cheese-chutney-sandwich": commonsImage("Grilled_cheese_sandwich.jpg"),
+  "aloo-tikki-burger": commonsImage("McAloo_Tikki_Burger.jpg"),
+  "paneer-burger": commonsImage("Paneer_Burger.jpg"),
+  "masala-pasta": commonsImage("Masala_pasta.jpg"),
+  "schezwan-pasta": commonsImage("Schezwan_pasta.jpg"),
+  "veg-cutlet": commonsImage("Vegetable_cutlet.jpg"),
+  "samosa": commonsImage("Samosa_4.jpg"),
+  "pav-bhaji": commonsImage("Bhaji_pav_2.jpg"),
+  "vada-pav": commonsImage("Vada_Pav-2.jpg"),
 };
 
-const FALLBACK_PHOTO = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Indian_Food.jpg/640px-Indian_Food.jpg";
+const FALLBACK_PHOTO = commonsImage("Indian_Food.jpg");
 
 function getDishPhoto(name: string) {
   return dishPhotos[normalizeRecipeKey(name)] ?? FALLBACK_PHOTO;
@@ -263,7 +263,7 @@ const makeIdea = (
 ): Meal => ({
   idMeal: `idea-${key}`,
   strMeal: name,
-  strMealThumb: dishPhotos[key] ?? FALLBACK_PHOTO,
+  strMealThumb: dishPhotos[key] ?? getDishPhoto(name),
   strCategory: category,
   strArea: "India",
   customDescription: description,
