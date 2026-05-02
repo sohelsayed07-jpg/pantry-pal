@@ -96,7 +96,12 @@ const Index = () => {
       const detailed = [...matched, ...fillers].slice(0, 10);
 
       setRecipes(detailed);
-      if (detailed.length === 0) {
+      if (matched.length === 0 && detailed.length > 0) {
+        toast({
+          title: "No exact matches",
+          description: "Showing other popular Indian dishes you might like.",
+        });
+      } else if (detailed.length === 0) {
         toast({
           title: "No Indian recipes found",
           description: "Try common ingredients like chicken, paneer, potato, or lentils.",
