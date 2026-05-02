@@ -20,6 +20,17 @@ type Meal = {
   [key: string]: string | undefined;
 };
 
+function commonsImage(fileName: string) {
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(fileName)}?width=640`;
+}
+
+function normalizeRecipeKey(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 const ingredientAliases: Record<string, string[]> = {
   mutton: ["mutton", "lamb", "goat"],
   capsicum: ["capsicum", "bell pepper", "pepper"],
@@ -35,7 +46,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-rogan-josh",
     strMeal: "Mutton Rogan Josh",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strMealThumb: commonsImage("Roghan_Josh.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Kashmiri-style mutton simmered with yogurt, browned onions, fennel, ginger, and warming spices.",
@@ -44,7 +55,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-biryani",
     strMeal: "Mutton Biryani",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/xrttsx1487339558.jpg",
+    strMealThumb: commonsImage("Mutton_biryani.JPG"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Fragrant basmati rice layered with spiced mutton, mint, fried onions, saffron, and slow dum cooking.",
@@ -53,7 +64,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-curry",
     strMeal: "Mutton Curry",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strMealThumb: commonsImage("Odia_Mutton_Curry_(Mansha_Tarkari).jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Homestyle Indian mutton curry cooked with onion, tomato, ginger-garlic paste, garam masala, and coriander.",
@@ -62,7 +73,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-keema",
     strMeal: "Mutton Keema Masala",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strMealThumb: commonsImage("Keema_matar.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Minced mutton sautéed with peas, onions, tomatoes, green chillies, and whole spices for a rich masala.",
@@ -71,7 +82,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-korma",
     strMeal: "Mutton Korma",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strMealThumb: commonsImage("Mutton_korma.JPG"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Tender mutton in a creamy cashew-yogurt gravy with cardamom, cloves, cinnamon, and gentle heat.",
@@ -80,7 +91,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-pepper-fry",
     strMeal: "Mutton Pepper Fry",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strMealThumb: commonsImage("Mutton_chukka.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "South Indian dry-style mutton tossed with crushed black pepper, curry leaves, coconut, and roasted spices.",
@@ -89,7 +100,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-sukka",
     strMeal: "Mutton Sukka",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strMealThumb: commonsImage("Mutton_chukka.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "A dry coastal-style mutton dish with roasted coconut, curry leaves, chilli, coriander, and garam masala.",
@@ -98,7 +109,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-do-pyaza",
     strMeal: "Mutton Do Pyaza",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strMealThumb: commonsImage("Mutton_Curry_1.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Mutton cooked with onions added two ways for sweetness, texture, and a thick restaurant-style gravy.",
@@ -107,7 +118,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-saagwala",
     strMeal: "Mutton Saagwala",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strMealThumb: commonsImage("Saag_gosht.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Slow-cooked mutton folded into spiced spinach gravy with garlic, green chilli, cumin, and cream.",
@@ -116,7 +127,7 @@ const muttonRecipeIdeas: Meal[] = [
   {
     idMeal: "idea-mutton-kheema-pav",
     strMeal: "Mutton Kheema Pav",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strMealThumb: commonsImage("Keema_pav.jpg"),
     strCategory: "Mutton",
     strArea: "India",
     customDescription: "Mumbai-style spiced mutton mince finished with butter, coriander, lime, and served with toasted pav.",
@@ -137,9 +148,31 @@ const buildIngredientRecipeIdeas = (wanted: string[]): Meal[] => {
   const ingredientText = display.toLowerCase();
   const idBase = clean.join("-").replace(/[^a-z0-9-]/g, "-");
   const searchBase = encodeURIComponent(`Indian ${ingredientText} recipe`);
-  const photo = clean.some((item) => ["chicken", "mutton", "lamb", "goat"].includes(item))
-    ? "https://www.themealdb.com/images/media/meals/1529446352.jpg"
-    : "https://www.themealdb.com/images/media/meals/urtpqw1487341253.jpg";
+  const photoBySuffix: Record<string, string> = clean.some((item) => item.includes("chicken"))
+    ? {
+        "Masala Curry": commonsImage("Chicken_curry.jpg"),
+        Korma: commonsImage("Chicken_Korma.JPG"),
+        Biryani: commonsImage("Chicken_biriyani-_My_cafe_restaurant_-_Meghalaya_DSC_009.jpg"),
+        "Tikka Masala": commonsImage("Chicken_Tikka_Masala_KellySue.JPG"),
+        "Do Pyaza": commonsImage("Chicken_Dopiaza.jpg"),
+        "Pepper Fry": commonsImage("Chicken_fry.jpg"),
+        Saagwala: commonsImage("Saag_chicken.jpg"),
+        Jalfrezi: commonsImage("Chicken_Jalfrezi.jpg"),
+        Vindaloo: commonsImage("Chicken_Vindaloo.jpg"),
+        Pulao: commonsImage("Chicken_pulao.jpg"),
+      }
+    : {
+        "Masala Curry": commonsImage("Paneer_butter_masala_2.jpg"),
+        Korma: commonsImage("Paneer_Korma_with_Gravy.jpg"),
+        Biryani: commonsImage("Panner_Vegetable_Hyderabad_Biryani.jpg"),
+        "Tikka Masala": commonsImage("Paneer_Tikka_Masala.jpg"),
+        "Do Pyaza": commonsImage("Paneer_Do_Pyaza.jpg"),
+        "Pepper Fry": commonsImage("Paneer_65.jpg"),
+        Saagwala: commonsImage("Palakpaneer_Rayagada_Odisha_0009.jpg"),
+        Jalfrezi: commonsImage("Paneer_Jalfrezi.jpg"),
+        Vindaloo: commonsImage("Vegetable_Vindaloo.jpg"),
+        Pulao: commonsImage("Paneer_pulao.jpg"),
+      };
 
   const templates = [
     ["Masala Curry", `A rich Indian curry built around ${ingredientText}, onion, tomato, ginger-garlic paste, and garam masala.`],
@@ -157,7 +190,7 @@ const buildIngredientRecipeIdeas = (wanted: string[]): Meal[] => {
   return templates.map(([suffix, description], index) => ({
     idMeal: `idea-${idBase}-${index}`,
     strMeal: `${display} ${suffix}`,
-    strMealThumb: photo,
+    strMealThumb: photoBySuffix[suffix] ?? getDishPhoto(`${display} ${suffix}`),
     strCategory: display,
     strArea: "India",
     customDescription: description,
@@ -167,55 +200,59 @@ const buildIngredientRecipeIdeas = (wanted: string[]): Meal[] => {
 
 type CategoryKey = "veg" | "nonveg" | "dessert" | "snacks";
 
-// Per-dish image URLs (Wikimedia Commons — accurate, royalty-free, dish-specific).
+// Per-dish image URLs (Wikimedia Commons Special:FilePath resolves reliably to the current image file).
 const dishPhotos: Record<string, string> = {
   // Veg
-  "paneer-butter-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Paneer_Butter_Masala.jpg/640px-Paneer_Butter_Masala.jpg",
-  "palak-paneer": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Palak_paneer.JPG/640px-Palak_paneer.JPG",
-  "chana-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Chana_masala_%28cropped%29.jpg/640px-Chana_masala_%28cropped%29.jpg",
-  "dal-makhani": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Dal_Makhani_at_Tridivian_food_festival.jpg/640px-Dal_Makhani_at_Tridivian_food_festival.jpg",
-  "aloo-gobi": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Aloo_gobi_03.jpg/640px-Aloo_gobi_03.jpg",
-  "baingan-bharta": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Baingan_Bharta_Indian_Food.jpg/640px-Baingan_Bharta_Indian_Food.jpg",
-  "rajma": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Rajma_Curry.JPG/640px-Rajma_Curry.JPG",
-  "veg-biryani": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Vegetable_biryani.JPG/640px-Vegetable_biryani.JPG",
-  "malai-kofta": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Malai_Kofta.jpg/640px-Malai_Kofta.jpg",
-  "bhindi-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Bhindi_Masala_Gravy.jpg/640px-Bhindi_Masala_Gravy.jpg",
+  "paneer-butter-masala": commonsImage("Paneer_butter_masala_2.jpg"),
+  "palak-paneer": commonsImage("Palakpaneer_Rayagada_Odisha_0009.jpg"),
+  "chana-masala": commonsImage("Chana_Masala_-_Mohammed_-_Spice_Of_Life_2024-05-27.jpg"),
+  "dal-makhani": commonsImage("Dal_Makhani.jpg"),
+  "aloo-gobi": commonsImage("Aloo_gobi.jpg"),
+  "baingan-bharta": commonsImage("Baingan_Ka_Bhurta.JPG"),
+  "rajma": commonsImage("Rajma_Masala_(32081557778).jpg"),
+  "veg-biryani": commonsImage("Vegetable_Biryani_IMG_001.jpg"),
+  "malai-kofta": commonsImage("Malai_Kofta_Curry.jpg"),
+  "bhindi-masala": commonsImage("Bhindi_Masala.jpg"),
   // Non-Veg
-  "butter-chicken": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Chicken_makhani.jpg/640px-Chicken_makhani.jpg",
-  "chicken-tikka-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Chicken_tikka_masala.jpg/640px-Chicken_tikka_masala.jpg",
-  "chicken-biryani": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Chicken_biryani_2.JPG/640px-Chicken_biryani_2.JPG",
-  "mutton-rogan-josh": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Roghan_Josh.jpg/640px-Roghan_Josh.jpg",
-  "mutton-curry": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Mutton_Curry.jpg/640px-Mutton_Curry.jpg",
-  "chicken-chettinad": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Chicken_Chettinad.jpg/640px-Chicken_Chettinad.jpg",
-  "fish-curry": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Goan_Fish_Curry.jpg/640px-Goan_Fish_Curry.jpg",
-  "prawn-masala": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Prawn_curry_with_rice.jpg/640px-Prawn_curry_with_rice.jpg",
-  "chicken-korma": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Chicken_korma.jpg/640px-Chicken_korma.jpg",
-  "egg-curry": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Egg_curry_-_Kerala_cuisine.jpg/640px-Egg_curry_-_Kerala_cuisine.jpg",
+  "butter-chicken": commonsImage("Chicken_makhani.jpg"),
+  "chicken-tikka-masala": commonsImage("Chicken_Tikka_Masala_KellySue.JPG"),
+  "chicken-biryani": commonsImage("Chicken_biriyani-_My_cafe_restaurant_-_Meghalaya_DSC_009.jpg"),
+  "mutton-rogan-josh": commonsImage("Roghan_Josh.jpg"),
+  "mutton-curry": commonsImage("Odia_Mutton_Curry_(Mansha_Tarkari).jpg"),
+  "chicken-chettinad": commonsImage("Chicken_Chettinad.jpg"),
+  "fish-curry": commonsImage("Goan_Fish_Curry.jpg"),
+  "prawn-masala": commonsImage("Prawn_curry_with_rice.jpg"),
+  "chicken-korma": commonsImage("Chicken_Korma.JPG"),
+  "egg-curry": commonsImage("Egg_curry_-_Kerala_cuisine.jpg"),
   // Dessert
-  "gulab-jamun": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Gulab_Jamun_%28Gibe3%29.JPG/640px-Gulab_Jamun_%28Gibe3%29.JPG",
-  "rasgulla": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Rasgulla_%28Roshogolla%29.jpg/640px-Rasgulla_%28Roshogolla%29.jpg",
-  "rasmalai": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Ras_Malai_-_Closeup.JPG/640px-Ras_Malai_-_Closeup.JPG",
-  "kheer": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Rice_kheer.jpg/640px-Rice_kheer.jpg",
-  "gajar-halwa": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Gajar_Halwa.JPG/640px-Gajar_Halwa.JPG",
-  "jalebi": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Jalebi_-_Kolkata_2011-10-08_5995.JPG/640px-Jalebi_-_Kolkata_2011-10-08_5995.JPG",
-  "kulfi": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Matka_Kulfi.jpg/640px-Matka_Kulfi.jpg",
-  "besan-ladoo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Besan_Ladoo.jpg/640px-Besan_Ladoo.jpg",
-  "mysore-pak": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Mysore_Pak_from_Sri_Krishna_Sweets.jpg/640px-Mysore_Pak_from_Sri_Krishna_Sweets.jpg",
-  "kaju-katli": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Kaju_Barfi.JPG/640px-Kaju_Barfi.JPG",
+  "gulab-jamun": commonsImage("Two_Gulab_Jamun_in_a_plate_01.jpg"),
+  "rasgulla": commonsImage("Rasgulla.jpg"),
+  "rasmalai": commonsImage("Ras_Malai_-_Closeup.JPG"),
+  "kheer": commonsImage("Rice_kheer.jpg"),
+  "gajar-halwa": commonsImage("Gajar_Halwa.JPG"),
+  "jalebi": commonsImage("Jalebi_-_Kolkata_2011-10-08_5995.JPG"),
+  "kulfi": commonsImage("Matka_Kulfi.jpg"),
+  "besan-ladoo": commonsImage("Besan_Ladoo.jpg"),
+  "mysore-pak": commonsImage("Mysore_Pak_from_Sri_Krishna_Sweets.jpg"),
+  "kaju-katli": commonsImage("Kaju_Barfi.JPG"),
   // Snacks
-  "veg-sandwich": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Bombay_sandwich.jpg/640px-Bombay_sandwich.jpg",
-  "grilled-cheese-chutney-sandwich": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Grilled_cheese_sandwich.jpg/640px-Grilled_cheese_sandwich.jpg",
-  "aloo-tikki-burger": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/McAloo_Tikki_Burger.jpg/640px-McAloo_Tikki_Burger.jpg",
-  "paneer-burger": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Paneer_Burger.jpg/640px-Paneer_Burger.jpg",
-  "masala-pasta": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Penne_pasta.jpg/640px-Penne_pasta.jpg",
-  "schezwan-pasta": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Penne_pasta.jpg/640px-Penne_pasta.jpg",
-  "veg-cutlet": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Vegetable_cutlet.jpg/640px-Vegetable_cutlet.jpg",
-  "samosa": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Samosa-and-chutney.jpg/640px-Samosa-and-chutney.jpg",
-  "pav-bhaji": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Pav_Bhaji_with_Onion_and_Lemon.jpg/640px-Pav_Bhaji_with_Onion_and_Lemon.jpg",
-  "vada-pav": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Vada_Pav-2.jpg/640px-Vada_Pav-2.jpg",
+  "veg-sandwich": commonsImage("Bombay_sandwich.jpg"),
+  "grilled-cheese-chutney-sandwich": commonsImage("Grilled_cheese_sandwich.jpg"),
+  "aloo-tikki-burger": commonsImage("McAloo_Tikki_Burger.jpg"),
+  "paneer-burger": commonsImage("Paneer_Burger.jpg"),
+  "masala-pasta": commonsImage("Masala_pasta.jpg"),
+  "schezwan-pasta": commonsImage("Schezwan_pasta.jpg"),
+  "veg-cutlet": commonsImage("Vegetable_cutlet.jpg"),
+  "samosa": commonsImage("Samosa_4.jpg"),
+  "pav-bhaji": commonsImage("Bhaji_pav_2.jpg"),
+  "vada-pav": commonsImage("Vada_Pav-2.jpg"),
 };
 
-const FALLBACK_PHOTO = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Indian_Food.jpg/640px-Indian_Food.jpg";
+const FALLBACK_PHOTO = commonsImage("Indian_Food.jpg");
+
+function getDishPhoto(name: string) {
+  return dishPhotos[normalizeRecipeKey(name)] ?? FALLBACK_PHOTO;
+}
 
 const makeIdea = (
   key: string,
@@ -226,7 +263,7 @@ const makeIdea = (
 ): Meal => ({
   idMeal: `idea-${key}`,
   strMeal: name,
-  strMealThumb: dishPhotos[key] ?? FALLBACK_PHOTO,
+  strMealThumb: dishPhotos[key] ?? getDishPhoto(name),
   strCategory: category,
   strArea: "India",
   customDescription: description,
@@ -363,24 +400,20 @@ const Index = () => {
       const wanted = list.map((i) => i.toLowerCase());
       const wantedTerms = wanted.map((w) => ingredientAliases[w] ?? [w]);
 
-      // Score each meal: matches in ingredients OR in the title/instructions.
+      // Score each meal using only its title and main ingredients so unrelated
+      // recipes are not picked just because the instructions mention the ingredient.
       const validMeals = allDetailed.filter((m): m is Meal => !!m);
       const scored = validMeals
         .map((m) => {
           const mealIngs = ingredientsOf(m);
-          const haystack = [
-            m.strMeal,
-            m.strCategory,
-            m.strInstructions,
-            ...mealIngs,
-          ]
+          const recipeIdentity = [m.strMeal, ...mealIngs.slice(0, 2)]
             .join(" ")
             .toLowerCase();
           const matches = wantedTerms.filter((terms) =>
             terms.some(
               (term) =>
                 mealIngs.some((mi) => mi.includes(term) || term.includes(mi)) ||
-                haystack.includes(term)
+                recipeIdentity.includes(term)
             )
           ).length;
           return { meal: m, matches };
@@ -504,7 +537,7 @@ const Index = () => {
                         const img = e.currentTarget;
                         if (img.dataset.fallback !== "1") {
                           img.dataset.fallback = "1";
-                          img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Indian_Food.jpg/640px-Indian_Food.jpg";
+                          img.src = FALLBACK_PHOTO;
                         }
                       }}
                     />
