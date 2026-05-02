@@ -541,7 +541,7 @@ const Index = () => {
                         const img = e.currentTarget;
                         if (img.dataset.fallback !== "1") {
                           img.dataset.fallback = "1";
-                          img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Indian_Food.jpg/640px-Indian_Food.jpg";
+                          img.src = FALLBACK_PHOTO;
                         }
                       }}
                     />
