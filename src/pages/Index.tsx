@@ -406,10 +406,7 @@ const Index = () => {
       const scored = validMeals
         .map((m) => {
           const mealIngs = ingredientsOf(m);
-          const recipeIdentity = [
-            m.strMeal,
-            ...mealIngs.slice(0, 5),
-          ]
+          const recipeIdentity = [m.strMeal, ...mealIngs.slice(0, 2)]
             .join(" ")
             .toLowerCase();
           const matches = wantedTerms.filter((terms) =>
