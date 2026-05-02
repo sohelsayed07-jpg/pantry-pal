@@ -249,12 +249,10 @@ const Index = () => {
       // so add Indian mutton recipe ideas instead of unrelated filler dishes.
       const matched = scored.filter((x) => x.matches > 0).map((x) => x.meal);
       const shouldAddMuttonIdeas = wanted.some((w) => w === "mutton");
-      const muttonFillers = shouldAddMuttonIdeas
-        ? muttonRecipeIdeas.filter(
-            (idea) => !matched.some((meal) => meal.strMeal.toLowerCase() === idea.strMeal.toLowerCase())
-          )
-        : [];
-      const detailed = [...matched, ...muttonFillers].slice(0, 10);
+      const ideaFillers = (shouldAddMuttonIdeas ? muttonRecipeIdeas : buildIngredientRecipeIdeas(wanted)).filter(
+        (idea) => !matched.some((meal) => meal.strMeal.toLowerCase() === idea.strMeal.toLowerCase())
+      );
+      const detailed = [...matched, ...ideaFillers].slice(0, 10);
 
       setRecipes(detailed);
       if (detailed.length === 0) {
