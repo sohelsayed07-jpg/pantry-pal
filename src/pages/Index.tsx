@@ -292,7 +292,7 @@ const Index = () => {
 
           {!loading &&
             recipes.map((r) => {
-              const link = r.strSource || r.strYoutube;
+              const link = r.strSource || r.strYoutube || r.customLink;
               return (
                 <Card
                   key={r.idMeal}
@@ -319,7 +319,7 @@ const Index = () => {
                         )}
                       </div>
                       <h2 className="text-lg font-semibold leading-tight">{r.strMeal}</h2>
-                      <p className="text-sm text-muted-foreground">{shortDesc(r.strInstructions)}</p>
+                      <p className="text-sm text-muted-foreground">{r.customDescription || shortDesc(r.strInstructions)}</p>
                       {link && (
                         <a
                           href={link}
