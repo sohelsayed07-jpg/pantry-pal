@@ -14,8 +14,114 @@ type Meal = {
   strInstructions?: string;
   strSource?: string;
   strYoutube?: string;
+  customDescription?: string;
+  customLink?: string;
   [key: string]: string | undefined;
 };
+
+const ingredientAliases: Record<string, string[]> = {
+  mutton: ["mutton", "lamb", "goat"],
+  capsicum: ["capsicum", "bell pepper", "pepper"],
+  brinjal: ["brinjal", "eggplant", "aubergine"],
+  curd: ["curd", "yogurt", "yoghurt"],
+  coriander: ["coriander", "cilantro"],
+  chana: ["chana", "chickpea", "chickpeas"],
+  aloo: ["aloo", "potato"],
+  paneer: ["paneer", "cottage cheese"],
+};
+
+const muttonRecipeIdeas: Meal[] = [
+  {
+    idMeal: "idea-mutton-rogan-josh",
+    strMeal: "Mutton Rogan Josh",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Kashmiri-style mutton simmered with yogurt, browned onions, fennel, ginger, and warming spices.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+rogan+josh+recipe",
+  },
+  {
+    idMeal: "idea-mutton-biryani",
+    strMeal: "Mutton Biryani",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/xrttsx1487339558.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Fragrant basmati rice layered with spiced mutton, mint, fried onions, saffron, and slow dum cooking.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+biryani+recipe",
+  },
+  {
+    idMeal: "idea-mutton-curry",
+    strMeal: "Mutton Curry",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Homestyle Indian mutton curry cooked with onion, tomato, ginger-garlic paste, garam masala, and coriander.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+curry+recipe",
+  },
+  {
+    idMeal: "idea-mutton-keema",
+    strMeal: "Mutton Keema Masala",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Minced mutton sautéed with peas, onions, tomatoes, green chillies, and whole spices for a rich masala.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+keema+masala+recipe",
+  },
+  {
+    idMeal: "idea-mutton-korma",
+    strMeal: "Mutton Korma",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Tender mutton in a creamy cashew-yogurt gravy with cardamom, cloves, cinnamon, and gentle heat.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+korma+recipe",
+  },
+  {
+    idMeal: "idea-mutton-pepper-fry",
+    strMeal: "Mutton Pepper Fry",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "South Indian dry-style mutton tossed with crushed black pepper, curry leaves, coconut, and roasted spices.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+pepper+fry+recipe",
+  },
+  {
+    idMeal: "idea-mutton-sukka",
+    strMeal: "Mutton Sukka",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "A dry coastal-style mutton dish with roasted coconut, curry leaves, chilli, coriander, and garam masala.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+sukka+recipe",
+  },
+  {
+    idMeal: "idea-mutton-do-pyaza",
+    strMeal: "Mutton Do Pyaza",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Mutton cooked with onions added two ways for sweetness, texture, and a thick restaurant-style gravy.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+do+pyaza+recipe",
+  },
+  {
+    idMeal: "idea-mutton-saagwala",
+    strMeal: "Mutton Saagwala",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Slow-cooked mutton folded into spiced spinach gravy with garlic, green chilli, cumin, and cream.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+saagwala+recipe",
+  },
+  {
+    idMeal: "idea-mutton-kheema-pav",
+    strMeal: "Mutton Kheema Pav",
+    strMealThumb: "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    strCategory: "Mutton",
+    strArea: "India",
+    customDescription: "Mumbai-style spiced mutton mince finished with butter, coriander, lime, and served with toasted pav.",
+    customLink: "https://www.google.com/search?q=Indian+mutton+kheema+pav+recipe",
+  },
+];
 
 const Index = () => {
   const [ingredients, setIngredients] = useState("");
