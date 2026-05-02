@@ -500,6 +500,13 @@ const Index = () => {
                       alt={r.strMeal}
                       loading="lazy"
                       className="h-48 w-full object-cover sm:h-auto sm:w-40 sm:shrink-0"
+                      onError={(e) => {
+                        const img = e.currentTarget;
+                        if (img.dataset.fallback !== "1") {
+                          img.dataset.fallback = "1";
+                          img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Indian_Food.jpg/640px-Indian_Food.jpg";
+                        }
+                      }}
                     />
                     <div className="flex flex-1 flex-col gap-2 p-4">
                       <div className="flex flex-wrap items-center gap-2">
