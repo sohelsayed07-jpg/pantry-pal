@@ -148,9 +148,31 @@ const buildIngredientRecipeIdeas = (wanted: string[]): Meal[] => {
   const ingredientText = display.toLowerCase();
   const idBase = clean.join("-").replace(/[^a-z0-9-]/g, "-");
   const searchBase = encodeURIComponent(`Indian ${ingredientText} recipe`);
-  const photo = clean.some((item) => ["chicken", "mutton", "lamb", "goat"].includes(item))
-    ? "https://www.themealdb.com/images/media/meals/1529446352.jpg"
-    : "https://www.themealdb.com/images/media/meals/urtpqw1487341253.jpg";
+  const photoBySuffix: Record<string, string> = clean.some((item) => item.includes("chicken"))
+    ? {
+        "Masala Curry": commonsImage("Chicken_curry.jpg"),
+        Korma: commonsImage("Chicken_Korma.JPG"),
+        Biryani: commonsImage("Chicken_biriyani-_My_cafe_restaurant_-_Meghalaya_DSC_009.jpg"),
+        "Tikka Masala": commonsImage("Chicken_Tikka_Masala_KellySue.JPG"),
+        "Do Pyaza": commonsImage("Chicken_Dopiaza.jpg"),
+        "Pepper Fry": commonsImage("Chicken_fry.jpg"),
+        Saagwala: commonsImage("Saag_chicken.jpg"),
+        Jalfrezi: commonsImage("Chicken_Jalfrezi.jpg"),
+        Vindaloo: commonsImage("Chicken_Vindaloo.jpg"),
+        Pulao: commonsImage("Chicken_pulao.jpg"),
+      }
+    : {
+        "Masala Curry": commonsImage("Paneer_butter_masala_2.jpg"),
+        Korma: commonsImage("Paneer_Korma_with_Gravy.jpg"),
+        Biryani: commonsImage("Panner_Vegetable_Hyderabad_Biryani.jpg"),
+        "Tikka Masala": commonsImage("Paneer_Tikka_Masala.jpg"),
+        "Do Pyaza": commonsImage("Paneer_Do_Pyaza.jpg"),
+        "Pepper Fry": commonsImage("Paneer_65.jpg"),
+        Saagwala: commonsImage("Palakpaneer_Rayagada_Odisha_0009.jpg"),
+        Jalfrezi: commonsImage("Paneer_Jalfrezi.jpg"),
+        Vindaloo: commonsImage("Vegetable_Vindaloo.jpg"),
+        Pulao: commonsImage("Paneer_pulao.jpg"),
+      };
 
   const templates = [
     ["Masala Curry", `A rich Indian curry built around ${ingredientText}, onion, tomato, ginger-garlic paste, and garam masala.`],
@@ -168,7 +190,7 @@ const buildIngredientRecipeIdeas = (wanted: string[]): Meal[] => {
   return templates.map(([suffix, description], index) => ({
     idMeal: `idea-${idBase}-${index}`,
     strMeal: `${display} ${suffix}`,
-    strMealThumb: photo,
+    strMealThumb: photoBySuffix[suffix] ?? getDishPhoto(`${display} ${suffix}`),
     strCategory: display,
     strArea: "India",
     customDescription: description,
