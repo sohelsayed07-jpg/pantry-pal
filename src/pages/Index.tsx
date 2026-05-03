@@ -583,7 +583,8 @@ const Index = () => {
               return (
                 <Card
                   key={r.idMeal}
-                  className="overflow-hidden rounded-2xl border-0 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5"
+                  onClick={() => setSelected(r)}
+                  className="cursor-pointer overflow-hidden rounded-2xl border-0 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5"
                 >
                   <div className="flex flex-col sm:flex-row">
                     <img
@@ -619,6 +620,7 @@ const Index = () => {
                           href={link}
                           target="_blank"
                           rel="noreferrer noopener"
+                          onClick={(e) => e.stopPropagation()}
                           className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                         >
                           View full recipe <ExternalLink className="h-3.5 w-3.5" />
@@ -662,6 +664,84 @@ const Index = () => {
           )}
         </section>
       </div>
+
+      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+          {selected && (
+            <>
+              <img
+                src={selected.strMealThumb}
+                alt={selected.strMeal}
+                className="h-48 w-full rounded-lg object-cover"
+                onError={(e) => {
+                  const img = e.currentTarget;
+                  if (img.dataset.fallback !== "1") {
+                    img.dataset.fallback = "1";
+                    img.src = FALLBACK_PHOTO;
+                  }
+                }}
+              />
+              <DialogHeader>
+                <DialogTitle className="text-xl">{selected.strMeal}</DialogTitle>
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  {selected.strCategory && (
+                    <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                      {selected.strCategory}
+                    </span>
+                  )}
+                  {selected.strArea && (
+                    <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
+                      {selected.strArea}
+                    </span>
+                  )}
+                </div>
+                <DialogDescription className="pt-2 text-sm text-foreground/80">
+                  {selected.customDescription || shortDesc(selected.strInstructions)}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold">Example ingredients</h3>
+                {(() => {
+                  const ings = getMealIngredients(selected);
+                  return ings.length ? (
+                    <ul className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                      {ings.map((ing, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                          <span>{ing}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Ingredient list not available.</p>
+                  );
+                })()}
+              </div>
+
+              {selected.strInstructions && (
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold">How it's made</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {selected.strInstructions}
+                  </p>
+                </div>
+              )}
+
+              {(selected.strSource || selected.strYoutube || selected.customLink) && (
+                <a
+                  href={selected.strSource || selected.strYoutube || selected.customLink}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                >
+                  View full recipe <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };
