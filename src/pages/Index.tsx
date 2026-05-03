@@ -317,6 +317,7 @@ const makeIdea = (
   strCategory: category,
   strArea: "India",
   customDescription: description,
+  customIngredients: dishIngredients[key],
   customLink: `https://www.google.com/search?q=${encodeURIComponent("Indian " + name + " recipe")}`,
 });
 
