@@ -3,6 +3,13 @@ import { Search, ExternalLink, Loader2, UtensilsCrossed, Flame } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 
 type Meal = {
@@ -16,7 +23,8 @@ type Meal = {
   strYoutube?: string;
   customDescription?: string;
   customLink?: string;
-  [key: string]: string | undefined;
+  customIngredients?: string[];
+  [key: string]: string | string[] | undefined;
 };
 
 function commonsImage(fileName: string) {
@@ -253,6 +261,49 @@ function getDishPhoto(name: string) {
   return dishPhotos[normalizeRecipeKey(name)] ?? FALLBACK_PHOTO;
 }
 
+const dishIngredients: Record<string, string[]> = {
+  "paneer-butter-masala": ["Paneer", "Tomato", "Onion", "Cashew", "Butter", "Cream", "Ginger-garlic paste", "Garam masala", "Kasuri methi", "Chilli powder"],
+  "palak-paneer": ["Spinach", "Paneer", "Onion", "Tomato", "Garlic", "Green chilli", "Cumin", "Cream", "Garam masala"],
+  "chana-masala": ["Chickpeas", "Onion", "Tomato", "Ginger-garlic paste", "Cumin", "Coriander powder", "Amchur", "Garam masala", "Green chilli"],
+  "dal-makhani": ["Black urad dal", "Rajma", "Butter", "Cream", "Tomato", "Ginger-garlic", "Cumin", "Garam masala"],
+  "aloo-gobi": ["Potato", "Cauliflower", "Onion", "Tomato", "Turmeric", "Cumin", "Ginger", "Coriander leaves"],
+  "baingan-bharta": ["Eggplant", "Onion", "Tomato", "Garlic", "Green chilli", "Cumin", "Coriander leaves", "Garam masala"],
+  "rajma": ["Rajma (kidney beans)", "Onion", "Tomato", "Ginger-garlic", "Cumin", "Coriander powder", "Garam masala", "Chilli powder"],
+  "veg-biryani": ["Basmati rice", "Mixed vegetables", "Mint", "Coriander", "Fried onions", "Yogurt", "Biryani masala", "Whole spices", "Saffron"],
+  "malai-kofta": ["Paneer", "Potato", "Cashew", "Cream", "Tomato", "Onion", "Ginger-garlic", "Garam masala"],
+  "bhindi-masala": ["Okra", "Onion", "Tomato", "Turmeric", "Coriander powder", "Amchur", "Garam masala"],
+  "butter-chicken": ["Chicken", "Yogurt", "Tomato", "Butter", "Cream", "Cashew", "Ginger-garlic", "Garam masala", "Kasuri methi"],
+  "chicken-tikka-masala": ["Chicken", "Yogurt", "Tomato", "Onion", "Ginger-garlic", "Garam masala", "Chilli powder", "Cream"],
+  "chicken-biryani": ["Basmati rice", "Chicken", "Yogurt", "Mint", "Coriander", "Fried onions", "Saffron", "Biryani masala", "Whole spices"],
+  "mutton-rogan-josh": ["Mutton", "Yogurt", "Onion", "Kashmiri chilli", "Fennel", "Ginger powder", "Garam masala"],
+  "mutton-curry": ["Mutton", "Onion", "Tomato", "Ginger-garlic", "Garam masala", "Coriander powder", "Chilli powder"],
+  "chicken-chettinad": ["Chicken", "Coconut", "Curry leaves", "Black pepper", "Star anise", "Roasted spices", "Onion", "Tomato"],
+  "fish-curry": ["Fish", "Coconut milk", "Kokum", "Onion", "Tomato", "Turmeric", "Chilli", "Coriander"],
+  "prawn-masala": ["Prawns", "Onion", "Tomato", "Ginger-garlic", "Turmeric", "Garam masala", "Coriander leaves"],
+  "chicken-korma": ["Chicken", "Yogurt", "Cashew paste", "Cream", "Cardamom", "Cloves", "Cinnamon", "Onion"],
+  "egg-curry": ["Eggs", "Onion", "Tomato", "Ginger-garlic", "Cumin", "Garam masala", "Chilli powder"],
+  "gulab-jamun": ["Khoya", "Maida", "Sugar", "Cardamom", "Rose water", "Ghee"],
+  "rasgulla": ["Chenna", "Sugar", "Cardamom", "Water"],
+  "rasmalai": ["Chenna", "Milk", "Sugar", "Saffron", "Cardamom", "Pistachios"],
+  "kheer": ["Rice", "Milk", "Sugar", "Cardamom", "Saffron", "Almonds", "Pistachios"],
+  "gajar-halwa": ["Carrots", "Milk", "Ghee", "Sugar", "Cardamom", "Khoya", "Nuts"],
+  "jalebi": ["Maida", "Yogurt", "Sugar", "Saffron", "Cardamom", "Ghee/oil"],
+  "kulfi": ["Milk", "Sugar", "Cardamom", "Saffron", "Pistachios"],
+  "besan-ladoo": ["Besan", "Ghee", "Sugar", "Cardamom", "Nuts"],
+  "mysore-pak": ["Besan", "Ghee", "Sugar"],
+  "kaju-katli": ["Cashews", "Sugar", "Cardamom", "Ghee"],
+  "veg-sandwich": ["Bread", "Potato", "Cucumber", "Tomato", "Onion", "Green chutney", "Butter", "Chaat masala"],
+  "grilled-cheese-chutney-sandwich": ["Bread", "Cheese", "Mint-coriander chutney", "Butter", "Chaat masala"],
+  "aloo-tikki-burger": ["Potato patty", "Burger bun", "Onion", "Lettuce", "Mint chutney", "Mayo"],
+  "paneer-burger": ["Paneer tikka patty", "Burger bun", "Onion", "Tomato", "Mint mayo", "Lettuce"],
+  "masala-pasta": ["Penne pasta", "Tomato", "Onion", "Capsicum", "Garlic", "Indian masala", "Cheese", "Herbs"],
+  "schezwan-pasta": ["Pasta", "Schezwan sauce", "Capsicum", "Onion", "Spring onion", "Garlic", "Soy sauce"],
+  "veg-cutlet": ["Potato", "Peas", "Carrot", "Bread crumbs", "Ginger", "Green chilli", "Garam masala"],
+  "samosa": ["Maida", "Potato", "Peas", "Cumin", "Coriander", "Garam masala", "Ginger", "Green chilli"],
+  "pav-bhaji": ["Pav", "Mixed vegetables", "Tomato", "Onion", "Butter", "Pav bhaji masala", "Capsicum"],
+  "vada-pav": ["Pav", "Potato vada", "Garlic chutney", "Green chutney", "Fried green chilli"],
+};
+
 const makeIdea = (
   key: string,
   name: string,
@@ -266,6 +317,7 @@ const makeIdea = (
   strCategory: category,
   strArea: "India",
   customDescription: description,
+  customIngredients: dishIngredients[key],
   customLink: `https://www.google.com/search?q=${encodeURIComponent("Indian " + name + " recipe")}`,
 });
 
@@ -339,6 +391,7 @@ const Index = () => {
   const [searched, setSearched] = useState(false);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
+  const [selected, setSelected] = useState<Meal | null>(null);
 
   const defaultIdeas: Meal[] = [
     ...categoryRecipes.veg,
@@ -394,7 +447,7 @@ const Index = () => {
         const out: string[] = [];
         for (let i = 1; i <= 20; i++) {
           const v = m[`strIngredient${i}`];
-          if (v && v.trim()) out.push(v.toLowerCase());
+          if (typeof v === "string" && v.trim()) out.push(v.toLowerCase());
         }
         return out;
       };
@@ -448,6 +501,20 @@ const Index = () => {
 
   const shortDesc = (text?: string) =>
     text ? text.replace(/\s+/g, " ").trim().slice(0, 140) + (text.length > 140 ? "…" : "") : "";
+
+  const getMealIngredients = (m: Meal): string[] => {
+    if (m.customIngredients && m.customIngredients.length) return m.customIngredients;
+    const out: string[] = [];
+    for (let i = 1; i <= 20; i++) {
+      const ing = m[`strIngredient${i}`];
+      const meas = m[`strMeasure${i}`];
+      if (typeof ing === "string" && ing.trim()) {
+        const measure = typeof meas === "string" ? meas.trim() : "";
+        out.push(measure ? `${ing.trim()} — ${measure}` : ing.trim());
+      }
+    }
+    return out;
+  };
 
   const totalPages = Math.max(1, Math.ceil(recipes.length / PAGE_SIZE));
   const pagedRecipes = recipes.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -516,7 +583,8 @@ const Index = () => {
               return (
                 <Card
                   key={r.idMeal}
-                  className="overflow-hidden rounded-2xl border-0 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5"
+                  onClick={() => setSelected(r)}
+                  className="cursor-pointer overflow-hidden rounded-2xl border-0 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5"
                 >
                   <div className="flex flex-col sm:flex-row">
                     <img
@@ -552,6 +620,7 @@ const Index = () => {
                           href={link}
                           target="_blank"
                           rel="noreferrer noopener"
+                          onClick={(e) => e.stopPropagation()}
                           className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                         >
                           View full recipe <ExternalLink className="h-3.5 w-3.5" />
@@ -595,6 +664,84 @@ const Index = () => {
           )}
         </section>
       </div>
+
+      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+          {selected && (
+            <>
+              <img
+                src={selected.strMealThumb}
+                alt={selected.strMeal}
+                className="h-48 w-full rounded-lg object-cover"
+                onError={(e) => {
+                  const img = e.currentTarget;
+                  if (img.dataset.fallback !== "1") {
+                    img.dataset.fallback = "1";
+                    img.src = FALLBACK_PHOTO;
+                  }
+                }}
+              />
+              <DialogHeader>
+                <DialogTitle className="text-xl">{selected.strMeal}</DialogTitle>
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  {selected.strCategory && (
+                    <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                      {selected.strCategory}
+                    </span>
+                  )}
+                  {selected.strArea && (
+                    <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
+                      {selected.strArea}
+                    </span>
+                  )}
+                </div>
+                <DialogDescription className="pt-2 text-sm text-foreground/80">
+                  {selected.customDescription || shortDesc(selected.strInstructions)}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold">Example ingredients</h3>
+                {(() => {
+                  const ings = getMealIngredients(selected);
+                  return ings.length ? (
+                    <ul className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                      {ings.map((ing, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                          <span>{ing}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Ingredient list not available.</p>
+                  );
+                })()}
+              </div>
+
+              {selected.strInstructions && (
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold">How it's made</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {selected.strInstructions}
+                  </p>
+                </div>
+              )}
+
+              {(selected.strSource || selected.strYoutube || selected.customLink) && (
+                <a
+                  href={selected.strSource || selected.strYoutube || selected.customLink}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                >
+                  View full recipe <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };
