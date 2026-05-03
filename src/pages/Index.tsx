@@ -449,6 +449,9 @@ const Index = () => {
   const shortDesc = (text?: string) =>
     text ? text.replace(/\s+/g, " ").trim().slice(0, 140) + (text.length > 140 ? "…" : "") : "";
 
+  const totalPages = Math.max(1, Math.ceil(recipes.length / PAGE_SIZE));
+  const pagedRecipes = recipes.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
     <main className="min-h-screen bg-[var(--gradient-soft)]">
       <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:pt-14">
@@ -508,7 +511,7 @@ const Index = () => {
           )}
 
           {!loading &&
-            recipes.map((r) => {
+            pagedRecipes.map((r) => {
               const link = r.strSource || r.strYoutube || r.customLink;
               return (
                 <Card
@@ -559,6 +562,37 @@ const Index = () => {
                 </Card>
               );
             })}
+
+          {!loading && recipes.length > PAGE_SIZE && (
+            <div className="flex items-center justify-between gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={page === 1}
+                onClick={() => {
+                  setPage((p) => Math.max(1, p - 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="rounded-xl"
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                type="button"
+                disabled={page >= totalPages}
+                onClick={() => {
+                  setPage((p) => Math.min(totalPages, p + 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="rounded-xl bg-[var(--gradient-warm)] text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-95"
+              >
+                Next 10 recipes
+              </Button>
+            </div>
+          )}
         </section>
       </div>
     </main>
