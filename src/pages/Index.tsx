@@ -24,7 +24,7 @@ type Meal = {
   customDescription?: string;
   customLink?: string;
   customIngredients?: string[];
-  [key: string]: string | undefined;
+  [key: string]: string | string[] | undefined;
 };
 
 function commonsImage(fileName: string) {
