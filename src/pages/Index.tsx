@@ -337,6 +337,8 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState<Meal[]>([]);
   const [searched, setSearched] = useState(false);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   const defaultIdeas: Meal[] = [
     ...categoryRecipes.veg,
@@ -353,7 +355,8 @@ const Index = () => {
       .filter(Boolean);
 
     if (list.length === 0) {
-      setRecipes(defaultIdeas.slice(0, 10));
+      setRecipes(defaultIdeas);
+      setPage(1);
       setSearched(true);
       toast({ title: "Showing popular Indian recipes", description: "Add ingredients to refine results." });
       return;
@@ -361,6 +364,7 @@ const Index = () => {
 
     setLoading(true);
     setSearched(true);
+    setPage(1);
     try {
       // Fetch all Indian meals once, then filter locally by ingredient text.
       // TheMealDB's filter.php only tags one main ingredient per meal, so
@@ -426,7 +430,7 @@ const Index = () => {
       const ideaFillers = [...baseIdeas, ...defaultIdeas].filter(
         (idea) => !matched.some((meal) => meal.strMeal.toLowerCase() === idea.strMeal.toLowerCase())
       );
-      const detailed = [...matched, ...ideaFillers].slice(0, 10);
+      const detailed = [...matched, ...ideaFillers];
 
       setRecipes(detailed);
       if (detailed.length === 0) {
@@ -444,6 +448,9 @@ const Index = () => {
 
   const shortDesc = (text?: string) =>
     text ? text.replace(/\s+/g, " ").trim().slice(0, 140) + (text.length > 140 ? "…" : "") : "";
+
+  const totalPages = Math.max(1, Math.ceil(recipes.length / PAGE_SIZE));
+  const pagedRecipes = recipes.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <main className="min-h-screen bg-[var(--gradient-soft)]">
@@ -504,7 +511,7 @@ const Index = () => {
           )}
 
           {!loading &&
-            recipes.map((r) => {
+            pagedRecipes.map((r) => {
               const link = r.strSource || r.strYoutube || r.customLink;
               return (
                 <Card
@@ -555,6 +562,37 @@ const Index = () => {
                 </Card>
               );
             })}
+
+          {!loading && recipes.length > PAGE_SIZE && (
+            <div className="flex items-center justify-between gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={page === 1}
+                onClick={() => {
+                  setPage((p) => Math.max(1, p - 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="rounded-xl"
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                type="button"
+                disabled={page >= totalPages}
+                onClick={() => {
+                  setPage((p) => Math.min(totalPages, p + 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="rounded-xl bg-[var(--gradient-warm)] text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-95"
+              >
+                Next 10 recipes
+              </Button>
+            </div>
+          )}
         </section>
       </div>
     </main>
