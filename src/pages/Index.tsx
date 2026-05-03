@@ -3,7 +3,6 @@ import { Search, ExternalLink, Loader2, UtensilsCrossed, Flame } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 
 type Meal = {
@@ -338,13 +337,13 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState<Meal[]>([]);
   const [searched, setSearched] = useState(false);
-  const [category, setCategory] = useState<CategoryKey>("veg");
 
-  const handleCategoryChange = (next: CategoryKey) => {
-    setCategory(next);
-    setRecipes(categoryRecipes[next]);
-    setSearched(true);
-  };
+  const defaultIdeas: Meal[] = [
+    ...categoryRecipes.veg,
+    ...categoryRecipes.nonveg,
+    ...categoryRecipes.snacks,
+    ...categoryRecipes.dessert,
+  ];
 
   const handleSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -354,10 +353,9 @@ const Index = () => {
       .filter(Boolean);
 
     if (list.length === 0) {
-      // No ingredients — just show the curated list for the active category.
-      setRecipes(categoryRecipes[category]);
+      setRecipes(defaultIdeas.slice(0, 10));
       setSearched(true);
-      toast({ title: `Showing ${categoryLabel[category]} ideas`, description: "Add ingredients to refine results." });
+      toast({ title: "Showing popular Indian recipes", description: "Add ingredients to refine results." });
       return;
     }
 
@@ -425,8 +423,7 @@ const Index = () => {
       const matched = scored.filter((x) => x.matches > 0).map((x) => x.meal);
       const shouldAddMuttonIdeas = wanted.some((w) => w === "mutton");
       const baseIdeas = shouldAddMuttonIdeas ? muttonRecipeIdeas : buildIngredientRecipeIdeas(wanted);
-      // Mix in category-specific ideas so the active tab still feels relevant.
-      const ideaFillers = [...baseIdeas, ...categoryRecipes[category]].filter(
+      const ideaFillers = [...baseIdeas, ...defaultIdeas].filter(
         (idea) => !matched.some((meal) => meal.strMeal.toLowerCase() === idea.strMeal.toLowerCase())
       );
       const detailed = [...matched, ...ideaFillers].slice(0, 10);
@@ -490,19 +487,6 @@ const Index = () => {
             Separate ingredients with commas.
           </p>
         </form>
-
-        <Tabs
-          value={category}
-          onValueChange={(v) => handleCategoryChange(v as CategoryKey)}
-          className="mt-6"
-        >
-          <TabsList className="grid w-full grid-cols-4 rounded-xl bg-secondary p-1">
-            <TabsTrigger value="veg" className="rounded-lg text-xs sm:text-sm">Veg</TabsTrigger>
-            <TabsTrigger value="nonveg" className="rounded-lg text-xs sm:text-sm">Non-Veg</TabsTrigger>
-            <TabsTrigger value="dessert" className="rounded-lg text-xs sm:text-sm">Dessert</TabsTrigger>
-            <TabsTrigger value="snacks" className="rounded-lg text-xs sm:text-sm">Snacks</TabsTrigger>
-          </TabsList>
-        </Tabs>
 
         <section className="mt-8 space-y-4" aria-live="polite">
           {loading && (
