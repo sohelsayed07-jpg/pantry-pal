@@ -391,6 +391,7 @@ const Index = () => {
   const [searched, setSearched] = useState(false);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
+  const [selected, setSelected] = useState<Meal | null>(null);
 
   const defaultIdeas: Meal[] = [
     ...categoryRecipes.veg,
@@ -500,6 +501,20 @@ const Index = () => {
 
   const shortDesc = (text?: string) =>
     text ? text.replace(/\s+/g, " ").trim().slice(0, 140) + (text.length > 140 ? "…" : "") : "";
+
+  const getMealIngredients = (m: Meal): string[] => {
+    if (m.customIngredients && m.customIngredients.length) return m.customIngredients;
+    const out: string[] = [];
+    for (let i = 1; i <= 20; i++) {
+      const ing = m[`strIngredient${i}`];
+      const meas = m[`strMeasure${i}`];
+      if (typeof ing === "string" && ing.trim()) {
+        const measure = typeof meas === "string" ? meas.trim() : "";
+        out.push(measure ? `${ing.trim()} — ${measure}` : ing.trim());
+      }
+    }
+    return out;
+  };
 
   const totalPages = Math.max(1, Math.ceil(recipes.length / PAGE_SIZE));
   const pagedRecipes = recipes.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
