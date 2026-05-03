@@ -3,6 +3,13 @@ import { Search, ExternalLink, Loader2, UtensilsCrossed, Flame } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 
 type Meal = {
@@ -16,6 +23,7 @@ type Meal = {
   strYoutube?: string;
   customDescription?: string;
   customLink?: string;
+  customIngredients?: string[];
   [key: string]: string | undefined;
 };
 
