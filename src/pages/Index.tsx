@@ -402,7 +402,7 @@ const Index = () => {
         const out: string[] = [];
         for (let i = 1; i <= 20; i++) {
           const v = m[`strIngredient${i}`];
-          if (v && v.trim()) out.push(v.toLowerCase());
+          if (typeof v === "string" && v.trim()) out.push(v.toLowerCase());
         }
         return out;
       };
