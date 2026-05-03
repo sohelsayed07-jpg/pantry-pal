@@ -337,6 +337,8 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState<Meal[]>([]);
   const [searched, setSearched] = useState(false);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   const defaultIdeas: Meal[] = [
     ...categoryRecipes.veg,
@@ -353,7 +355,8 @@ const Index = () => {
       .filter(Boolean);
 
     if (list.length === 0) {
-      setRecipes(defaultIdeas.slice(0, 10));
+      setRecipes(defaultIdeas);
+      setPage(1);
       setSearched(true);
       toast({ title: "Showing popular Indian recipes", description: "Add ingredients to refine results." });
       return;
@@ -361,6 +364,7 @@ const Index = () => {
 
     setLoading(true);
     setSearched(true);
+    setPage(1);
     try {
       // Fetch all Indian meals once, then filter locally by ingredient text.
       // TheMealDB's filter.php only tags one main ingredient per meal, so
@@ -426,7 +430,7 @@ const Index = () => {
       const ideaFillers = [...baseIdeas, ...defaultIdeas].filter(
         (idea) => !matched.some((meal) => meal.strMeal.toLowerCase() === idea.strMeal.toLowerCase())
       );
-      const detailed = [...matched, ...ideaFillers].slice(0, 10);
+      const detailed = [...matched, ...ideaFillers];
 
       setRecipes(detailed);
       if (detailed.length === 0) {
